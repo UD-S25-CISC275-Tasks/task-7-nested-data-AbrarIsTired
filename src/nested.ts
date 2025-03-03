@@ -1,5 +1,6 @@
 import { Answer } from "./interfaces/answer";
 import { Question, QuestionType } from "./interfaces/question";
+import { makeBlankQuestion, duplicateQuestion} from "./objects";
 
 /**
  * Consumes an array of questions and returns a new array with only the questions
@@ -141,7 +142,8 @@ export function addNewQuestion(
     name: string,
     type: QuestionType,
 ): Question[] {
-    return [];
+    let blankQuestion = makeBlankQuestion(id, name, type)
+    return [...questions, blankQuestion];
 }
 
 /***
@@ -154,7 +156,15 @@ export function renameQuestionById(
     targetId: number,
     newName: string,
 ): Question[] {
-    return [];
+    return questions.map((question) => {
+        if (question.id === targetId) {
+            return {
+                ...question,
+                name: newName,
+            };
+        }
+        return question;
+    });
 }
 
 /***
@@ -169,7 +179,19 @@ export function changeQuestionTypeById(
     targetId: number,
     newQuestionType: QuestionType,
 ): Question[] {
-    return [];
+    return questions.map((question) => {
+        if (question.id === targetId) {
+            const updatedQuestion = { ...question, type: newQuestionType };
+
+            // Clear options if it's no longer a multiple choice question
+            if (newQuestionType !== "multiple_choice_question") {
+                updatedQuestion.options = [];
+            }
+
+            return updatedQuestion;
+        }
+        return question;
+    });
 }
 
 /**
@@ -188,7 +210,25 @@ export function editOption(
     targetOptionIndex: number,
     newOption: string,
 ): Question[] {
-    return [];
+    return questions.map((question) => {
+        if (question.id === targetId) {
+            let updatedOptions = [...question.options];
+
+            if (targetOptionIndex === -1) {
+                // Add to the end
+                updatedOptions.push(newOption);
+            } else {
+                // Replace existing
+                updatedOptions[targetOptionIndex] = newOption;
+            }
+
+            return {
+                ...question,
+                options: updatedOptions,
+            };
+        }
+        return question;
+    });
 }
 
 /***
@@ -202,5 +242,15 @@ export function duplicateQuestionInArray(
     targetId: number,
     newId: number,
 ): Question[] {
-    return [];
+    const targetIndex = questions.findIndex((q) => q.id === targetId);
+    if (targetIndex === -1) return [...questions]; // No match found
+
+    const duplicate = duplicateQuestion(newId, questions[targetIndex]);
+
+    // Create new array with duplicate inserted after original
+    return [
+        ...questions.slice(0, targetIndex + 1),
+        duplicate,
+        ...questions.slice(targetIndex + 1),
+    ];
 }
