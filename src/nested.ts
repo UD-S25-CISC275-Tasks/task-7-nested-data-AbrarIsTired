@@ -1,6 +1,6 @@
 import { Answer } from "./interfaces/answer";
 import { Question, QuestionType } from "./interfaces/question";
-import { makeBlankQuestion, duplicateQuestion} from "./objects";
+import { makeBlankQuestion, duplicateQuestion } from "./objects";
 
 /**
  * Consumes an array of questions and returns a new array with only the questions
@@ -15,12 +15,14 @@ export function getPublishedQuestions(questions: Question[]): Question[] {
  * considered "non-empty". An empty question has an empty string for its `body` and
  * `expected`, and an empty array for its `options`.
  */
+/**
+ * Consumes an array of questions and returns a new array of only the questions that are
+ * considered "non-empty". An empty question has an empty string for its `body` and
+ * `expected`, and an empty array for its `options`.
+ */
 export function getNonEmptyQuestions(questions: Question[]): Question[] {
     return questions.filter(
-        (questions) =>
-            questions.body !== "" &&
-            questions.expected !== "" &&
-            questions.options.length > 0,
+        (question) => question.body !== "" && question.expected !== "",
     );
 }
 
@@ -142,7 +144,7 @@ export function addNewQuestion(
     name: string,
     type: QuestionType,
 ): Question[] {
-    let blankQuestion = makeBlankQuestion(id, name, type)
+    let blankQuestion = makeBlankQuestion(id, name, type);
     return [...questions, blankQuestion];
 }
 
